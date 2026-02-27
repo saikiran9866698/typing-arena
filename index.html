@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Typing Arena</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+  <h1>⚡ Ultimate Typing Arena</h1>
+  <div class="nav-controls">
+    <button onclick="toggleTheme()">Theme</button>
+    <button onclick="showDashboard()">Dashboard</button>
+    <button onclick="startMultiplayer()">Multiplayer</button>
+  </div>
+</header>
+
+<section class="stats-bar">
+  <div>Time: <span id="time">0</span></div>
+  <div>WPM: <span id="wpm">0</span></div>
+  <div>Accuracy: <span id="accuracy">100</span>%</div>
+  <div>CPM: <span id="cpm">0</span></div>
+</section>
+
+<section class="typing-box">
+  <div id="textDisplay" class="text-display"></div>
+  <textarea id="input" placeholder="Start typing..." disabled></textarea>
+</section>
+
+<section class="controls">
+  <select id="timeSelect">
+    <option value="30">30s</option>
+    <option value="60" selected>60s</option>
+    <option value="120">120s</option>
+  </select>
+  <button onclick="startTest()">Start</button>
+  <button onclick="restartTest()">Restart</button>
+  <button onclick="generateAIText()">AI Challenge</button>
+</section>
+
+<section class="leaderboard">
+  <h2>🌎 Global Leaderboard</h2>
+  <ul id="scores"></ul>
+</section>
+
+<section id="dashboard" class="dashboard hidden">
+  <h2>📊 Performance Analytics</h2>
+  <canvas id="performanceChart"></canvas>
+</section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
