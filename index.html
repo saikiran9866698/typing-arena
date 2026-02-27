@@ -3,61 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Typing Arena</title>
-<link rel="manifest" href="manifest.json">
+<title>Typing Speed Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#111827;
+  --accent:#6366f1;
+  --text:#f8fafc;
+  --correct:#22c55e;
+  --incorrect:#ef4444;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,sans-serif;
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  padding:30px 15px;
+}
+.container{
+  width:100%;
+  max-width:800px;
+}
+.card{
+  background:var(--card);
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
+}
+h1{
+  text-align:center;
+  font-weight:800;
+  margin-bottom:20px;
+}
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+  font-weight:600;
+}
+.stat{
+  text-align:center;
+}
+.text-display{
+  font-family:"JetBrains Mono",monospace;
+  background:#0b1220;
+  padding:20px;
+  border-radius:12px;
+  line-height:1.8;
+  margin-bottom:15px;
+  min-height:100px;
+}
+.correct{color:var(--correct);}
+.incorrect{color:var(--incorrect);}
+textarea{
+  width:100%;
+  height:120px;
+  border-radius:12px;
+  border:none;
+  padding:15px;
+  font-size:18px;
+  resize:none;
+  outline:none;
+}
+.controls{
+  margin-top:15px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+button,select{
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+}
+button{
+  background:var(--accent);
+  color:white;
+  transition:0.2s;
+}
+button:hover{
+  transform:scale(1.05);
+}
+@media(max-width:600px){
+  .stats{flex-direction:column; gap:10px;}
+}
+</style>
 </head>
-
 <body>
 
-<div class="app">
+<div class="container">
+<div class="card">
 
-<header>
-  <h1>⚡ Ultimate Typing Arena</h1>
-  <div class="nav-controls">
-    <button onclick="toggleTheme()">Theme</button>
-    <button onclick="showDashboard()">Dashboard</button>
-    <button onclick="startMultiplayer()">Multiplayer</button>
-  </div>
-</header>
+<h1>Typing Speed Test</h1>
 
-<section class="stats-bar">
-  <div>Time: <span id="time">0</span></div>
-  <div>WPM: <span id="wpm">0</span></div>
-  <div>Accuracy: <span id="accuracy">100</span>%</div>
-  <div>CPM: <span id="cpm">0</span></div>
-</section>
+<div class="stats">
+  <div class="stat">Time<br><span id="time">60</span>s</div>
+  <div class="stat">WPM<br><span id="wpm">0</span></div>
+  <div class="stat">Accuracy<br><span id="accuracy">100</span>%</div>
+</div>
 
-<section class="typing-box">
-  <div id="textDisplay" class="text-display"></div>
-  <textarea id="input" placeholder="Start typing..." disabled></textarea>
-</section>
+<div class="text-display" id="textDisplay"></div>
 
-<section class="controls">
-  <select id="timeSelect">
+<textarea id="input" placeholder="Start typing here..." disabled></textarea>
+
+<div class="controls">
+  <select id="duration">
     <option value="30">30s</option>
     <option value="60" selected>60s</option>
     <option value="120">120s</option>
   </select>
   <button onclick="startTest()">Start</button>
-  <button onclick="restartTest()">Restart</button>
-  <button onclick="generateAIText()">AI Challenge</button>
-</section>
-
-<section class="leaderboard">
-  <h2>🌎 Global Leaderboard</h2>
-  <ul id="scores"></ul>
-</section>
-
-<section id="dashboard" class="dashboard hidden">
-  <h2>📊 Performance Analytics</h2>
-  <canvas id="performanceChart"></canvas>
-</section>
-
+  <button onclick="resetTest()">Reset</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="app.js"></script>
+</div>
+</div>
+
+<script>
+const defaultText = "The quick brown fox jumps over the lazy dog";
+let text = defaultText;
+let timer = null;
+let startTime = null;
+let duration = 60;
+
+const textDisplay = document.getElementById("textDisplay");
+const input = document.getElementById("input");
+
+function renderText(){
+  textDisplay.innerHTML = "";
+  text.split("").forEach(char=>{
+    const span = document.createElement("span");
+    span.innerText = char;
+    textDisplay.appendChild(span);
+  });
+}
+renderText();
+
+function startTest(){
+  resetTest();
+  duration = parseInt(document.getElementById("duration").value);
+  document.getElementById("time").innerText = duration;
+  input.disabled = false;
+  input.focus();
+  startTime = new Date();
+  timer = setInterval(updateTimer,1000);
+}
+
+function updateTimer(){
+  const elapsed = Math.floor((new Date() - startTime)/1000);
+  const remaining = duration - elapsed;
+  document.getElementById("time").innerText = remaining;
+  if(remaining <= 0){
+    clearInterval(timer);
+    input.disabled = true;
+  }
+}
+
+input.addEventListener("input",()=>{
+  const spans = textDisplay.querySelectorAll("span");
+  const typed = input.value.split("");
+  let correctChars = 0;
+
+  spans.forEach((span,i)=>{
+    if(typed[i] == null){
+      span.classList.remove("correct","incorrect");
+    } else if(typed[i] === span.innerText){
+      span.classList.add("correct");
+      span.classList.remove("incorrect");
+      correctChars++;
+    } else {
+      span.classList.add("incorrect");
+      span.classList.remove("correct");
+    }
+  });
+
+  const elapsedMinutes = (new Date() - startTime)/60000;
+  const wpm = Math.round((correctChars/5)/elapsedMinutes) || 0;
+  const accuracy = Math.round((correctChars/typed.length)*100) || 100;
+
+  document.getElementById("wpm").innerText = wpm;
+  document.getElementById("accuracy").innerText = accuracy;
+});
+
+function resetTest(){
+  clearInterval(timer);
+  input.value = "";
+  input.disabled = true;
+  document.getElementById("wpm").innerText = 0;
+  document.getElementById("accuracy").innerText = 100;
+  renderText();
+}
+</script>
+
 </body>
 </html>
